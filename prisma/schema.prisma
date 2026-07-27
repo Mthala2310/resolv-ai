@@ -1,0 +1,90 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+
+// ---------- ENUM (nilai yang dikunci) ----------
+enum Role {
+  customer
+  admin
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum Status {
+  BARU
+  DITINJAU
+  DIPROSES
+  SELESAI
+}
+
+// ---------- TABEL users ----------
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role     @default(customer)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // relasi
+  complaints  Complaint[]           // 1 user punya banyak keluhan
+  corrections ComplaintCorrection[] @relation("CorrectedBy") // koreksi yang dibuat admin ini
+
+  @@map("users")
+}
+
+// ---------- TABEL complaints ----------
+model Complaint {
+  id                 String    @id @default(cuid())
+  userId             String    @map("user_id")
+  judul              String
+  deskripsi          String
+  kategoriPrediksi   String?   @map("kategori_prediksi")
+  confidenceKategori Float?    @map("confidence_kategori")
+  prioritasPrediksi  Priority? @map("prioritas_prediksi")
+  kategoriFinal      String?   @map("kategori_final")
+  prioritasFinal     Priority? @map("prioritas_final")
+  status             Status    @default(BARU)
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @updatedAt      @map("updated_at")
+
+  // relasi
+  user        User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  corrections ComplaintCorrection[]
+
+  @@map("complaints")
+}
+
+// ---------- TABEL complaint_corrections ----------
+model ComplaintCorrection {
+  id               String    @id @default(cuid())
+  complaintId      String    @map("complaint_id")
+  correctedBy      String    @map("corrected_by")
+  kategoriSebelum  String?   @map("kategori_sebelum")
+  kategoriSesudah  String?   @map("kategori_sesudah")
+  prioritasSebelum Priority? @map("prioritas_sebelum")
+  prioritasSesudah Priority? @map("prioritas_sesudah")
+  createdAt        DateTime  @default(now()) @map("created_at")
+
+  // relasi
+  complaint Complaint @relation(fields: [complaintId], references: [id], onDelete: Cascade)
+  corrector User      @relation("CorrectedBy", fields: [correctedBy], references: [id])
+
+  @@map("complaint_corrections")
+}
