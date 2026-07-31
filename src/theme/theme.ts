@@ -39,11 +39,14 @@ const theme = createTheme({
     text: { primary: "#2A3547", secondary: "#5A6A85" },
   },
   typography: {
-    fontFamily: "var(--font-plus-jakarta), sans-serif",
-    h1: { fontSize: "2.25rem", fontWeight: 600 },
-    h2: { fontSize: "1.875rem", fontWeight: 600 },
-    h3: { fontSize: "1.5rem", fontWeight: 600 },
-    button: { textTransform: "none", fontWeight: 600 }, // tombol tanpa HURUF BESAR
+    fontFamily: "'General Sans', var(--font-plus-jakarta), sans-serif",
+    h1: { fontFamily: "'General Sans', sans-serif", fontSize: "2.25rem", fontWeight: 600 },
+    h2: { fontFamily: "'General Sans', sans-serif", fontSize: "1.875rem", fontWeight: 600 },
+    h3: { fontFamily: "'General Sans', sans-serif", fontSize: "1.5rem", fontWeight: 600 },
+    h4: { fontFamily: "'General Sans', sans-serif", fontSize: "1.25rem", fontWeight: 500 },
+    h5: { fontFamily: "'General Sans', sans-serif", fontSize: "1.125rem", fontWeight: 500 },
+    h6: { fontFamily: "'General Sans', sans-serif", fontSize: "1rem", fontWeight: 500 },
+    button: { fontFamily: "'General Sans', sans-serif", textTransform: "none", fontWeight: 600 },
   },
   shape: { borderRadius: 8 },
   components: {
