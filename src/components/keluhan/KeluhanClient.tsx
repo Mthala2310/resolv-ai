@@ -27,6 +27,7 @@ import {
   Alert,
   Tooltip,
   Fab,
+  Badge,
 } from "@mui/material";
 import {
   IconBolt,
@@ -40,6 +41,7 @@ import {
   IconLogout,
   IconPlus,
   IconHelp,
+  IconMessageCircle,
 } from "@tabler/icons-react";
 import {
   STATUS_META,
@@ -56,6 +58,7 @@ type Complaint = {
   status: ComplaintStatus;
   createdAt: string;
   updatedAt: string;
+  _count?: { feedbacks: number };
 };
 type View = "dashboard" | "detail" | "create";
 
@@ -644,6 +647,24 @@ function DashboardView({
                   "&:hover .title": { color: "primary.main" },
                 }}
               >
+                {c._count?.feedbacks &&
+                c._count.feedbacks >
+                  parseInt(
+                    localStorage.getItem(`read_feedbacks_${c.id}`) || "0",
+                  ) ? (
+                  <Box
+                    sx={{
+                      position: "absolute",
+                      top: 16,
+                      right: 16,
+                      width: 10,
+                      height: 10,
+                      borderRadius: "50%",
+                      bgcolor: "#ef4444",
+                      boxShadow: "0 0 0 4px #fee2e2",
+                    }}
+                  />
+                ) : null}
                 <CardContent sx={{ p: 3 }}>
                   <Stack
                     direction="row"
@@ -853,6 +874,9 @@ function DetailView({ c }: { c: Complaint }) {
             </Box>
           </CardContent>
         </Card>
+
+        {/* Pesan dari Tim Support */}
+        <UserFeedbackCard complaintId={c.id} />
       </Stack>
     </Box>
   );
@@ -1038,4 +1062,108 @@ function buildHistory(
     });
   }
   return h;
+}
+
+/* ---------- User Feedback Card ---------- */
+type FeedbackItem = {
+  id: string;
+  pesan: string;
+  createdAt: string;
+  admin: { name: string | null };
+};
+
+function UserFeedbackCard({ complaintId }: { complaintId: string }) {
+  const [feedbacks, setFeedbacks] = useState<FeedbackItem[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch(`/api/complaints/${complaintId}/feedback`)
+      .then((r) => r.json())
+      .then((d) => {
+        const fbs = d.feedbacks ?? [];
+        setFeedbacks(fbs);
+        if (fbs.length > 0) {
+          localStorage.setItem(`read_feedbacks_${complaintId}`, fbs.length.toString());
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, [complaintId]);
+
+  if (loading) return null; // silent load — jangan ganggu UX
+  if (feedbacks.length === 0) return null; // sembunyikan jika kosong
+
+  return (
+    <Card
+      elevation={0}
+      sx={{
+        borderRadius: 3,
+        border: "1px solid #dbeafe",
+        bgcolor: "#f0f7ff",
+      }}
+    >
+      <CardContent sx={{ p: 3 }}>
+        <Stack
+          sx={{ flexDirection: "row", gap: 1, alignItems: "center", mb: 2.5 }}
+        >
+          <Box
+            sx={{
+              p: 0.75,
+              borderRadius: 1.5,
+              bgcolor: "#5D5FEF",
+              display: "flex",
+              alignItems: "center",
+            }}
+          >
+            <IconMessageCircle size={14} color="#fff" />
+          </Box>
+          <Typography sx={{ fontSize: 14, fontWeight: 800, color: "#0f172a" }}>
+            Pesan dari Tim Support
+          </Typography>
+          <Chip
+            label={feedbacks.length}
+            size="small"
+            sx={{
+              height: 18,
+              fontSize: 10,
+              fontWeight: 700,
+              bgcolor: "#5D5FEF",
+              color: "#fff",
+            }}
+          />
+        </Stack>
+
+        <Stack spacing={1.5}>
+          {feedbacks.map((fb) => (
+            <Box key={fb.id}>
+              <Box
+                sx={{
+                  bgcolor: "#fff",
+                  borderRadius: "4px 12px 12px 12px",
+                  p: 2,
+                  border: "1px solid #dbeafe",
+                  boxShadow: "0 1px 4px rgba(93,95,239,0.06)",
+                  maxWidth: "88%",
+                }}
+              >
+                <Typography
+                  sx={{
+                    fontSize: 13,
+                    color: "#1e293b",
+                    lineHeight: 1.7,
+                    whiteSpace: "pre-wrap",
+                  }}
+                >
+                  {fb.pesan}
+                </Typography>
+              </Box>
+              <Typography sx={{ fontSize: 11, color: "#94a3b8", mt: 0.5, ml: 0.5 }}>
+                {fb.admin.name ?? "Tim Support"} • {fmtDateTime(fb.createdAt)}
+              </Typography>
+            </Box>
+          ))}
+        </Stack>
+      </CardContent>
+    </Card>
+  );
 }
