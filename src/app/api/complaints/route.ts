@@ -4,6 +4,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { classifyComplaint } from "@/lib/ml";
 import { computePriority, type Priority } from "@/lib/priority";
+import { rateLimit } from "@/lib/rateLimit";
 
 // ── POST /api/complaints ── buat keluhan baru
 export async function POST(req: Request) {
@@ -11,6 +12,14 @@ export async function POST(req: Request) {
   const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Harus login dulu." }, { status: 401 });
+  }
+
+  const rl = rateLimit(`complaint:${session.user.id}`, 5, 60_000); // 5 keluhan / menit / user
+  if (!rl.allowed) {
+    return NextResponse.json(
+      { ok: false, error: `Terlalu banyak kiriman. Coba lagi dalam ${rl.retryAfterSec} detik.` },
+      { status: 429, headers: { "Retry-After": String(rl.retryAfterSec) } },
+    );
   }
 
   // 2) Ambil & validasi input dari body JSON

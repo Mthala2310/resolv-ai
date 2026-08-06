@@ -45,6 +45,8 @@ import {
   IconMessageCircle,
   IconSend,
   IconChartBar,
+  IconDownload,
+  IconFileSpreadsheet,
 } from "@tabler/icons-react";
 import AnalyticsView from "./AnalyticsView";
 import {
@@ -188,6 +190,25 @@ export default function AdminClient({
     } finally {
       setWaking(false);
     }
+  }
+
+  function exportCsv() {
+    const p = new URLSearchParams();
+    if (filters.status) p.set("status", filters.status);
+    if (filters.prioritas) p.set("prioritas", filters.prioritas);
+    if (filters.kategori) p.set("kategori", filters.kategori);
+    if (filters.q) p.set("q", filters.q);
+    window.location.href = `/api/admin/complaints/export?${p.toString()}`;
+  }
+
+  function exportExcel() {
+    const p = new URLSearchParams();
+    if (filters.status) p.set("status", filters.status);
+    if (filters.prioritas) p.set("prioritas", filters.prioritas);
+    if (filters.kategori) p.set("kategori", filters.kategori);
+    if (filters.q) p.set("q", filters.q);
+    p.set("format", "excel");
+    window.location.href = `/api/admin/complaints/export?${p.toString()}`;
   }
 
   return (
@@ -460,6 +481,14 @@ export default function AdminClient({
                       </MenuItem>
                     ))}
                   </TextField>
+                  <Button onClick={exportCsv} variant="outlined" startIcon={<IconDownload size={18} />}
+                    sx={{ textTransform: "none", borderRadius: 2, whiteSpace: "nowrap" }}>
+                    Export CSV
+                  </Button>
+                  <Button onClick={exportExcel} variant="contained" color="success" startIcon={<IconFileSpreadsheet size={18} />}
+                    sx={{ textTransform: "none", borderRadius: 2, whiteSpace: "nowrap", boxShadow: 0 }}>
+                    Export Excel
+                  </Button>
                 </CardContent>
               </Card>
 
@@ -637,6 +666,18 @@ function DetailPanel({
     data.prioritasFinal ?? "",
   );
   const [saving, setSaving] = useState(false);
+  const [reclassifying, setReclassifying] = useState(false);
+
+  async function reclassify() {
+    setReclassifying(true);
+    try {
+      const res = await fetch(`/api/admin/complaints/${data.id}/reclassify`, { method: "POST" });
+      const d = await res.json();
+      if (!res.ok || !d.ok) { onError(d.error ?? "Gagal klasifikasi ulang."); return; }
+      onSaved("Klasifikasi ulang selesai.");
+    } catch { onError("Kesalahan jaringan."); }
+    finally { setReclassifying(false); }
+  }
 
   const changed =
     status !== data.status ||
@@ -702,15 +743,16 @@ function DetailPanel({
           }}
         >
           <CardContent sx={{ p: 3 }}>
-            <Stack
-              sx={{ flexDirection: "row", gap: 1, alignItems: "center", mb: 2 }}
-            >
-              <IconSparkles size={16} color="#5D5FEF" />
-              <Typography
-                sx={{ fontSize: 14, fontWeight: 800, color: "#0f172a" }}
-              >
-                Analisis AI (mBERT)
-              </Typography>
+            <Stack sx={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
+              <Stack sx={{ flexDirection: "row", gap: 1, alignItems: "center" }}>
+                <IconSparkles size={16} color="#5D5FEF" />
+                <Typography sx={{ fontSize: 14, fontWeight: 800, color: "#0f172a" }}>Analisis AI (mBERT)</Typography>
+              </Stack>
+              <Button onClick={reclassify} disabled={reclassifying} size="small"
+                startIcon={reclassifying ? <CircularProgress size={14} color="inherit" /> : <IconRefresh size={14} />}
+                sx={{ textTransform: "none" }}>
+                {reclassifying ? "Menganalisis..." : "Klasifikasi ulang"}
+              </Button>
             </Stack>
             <Stack sx={{ flexDirection: "row", gap: 4, flexWrap: "wrap" }}>
               <Box>

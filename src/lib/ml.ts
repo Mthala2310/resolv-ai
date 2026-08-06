@@ -1,5 +1,8 @@
 // src/lib/ml.ts
 import { Client } from "@gradio/client";
+import { withTimeout, TimeoutError } from "@/lib/withTimeout";
+
+const ML_TIMEOUT_MS = 20_000; // 20 detik
 
 const SPACE_ID = process.env.HF_SPACE_ID ?? "Mthala/resolv-ai-space";
 const ML_API_KEY = process.env.ML_API_KEY ?? "secret-key-resolv-dev";
@@ -35,9 +38,12 @@ async function getClient(): Promise<Client> {
 /** Kirim teks keluhan ke model → dapat kategori + confidence */
 export async function classifyComplaint(text: string): Promise<PredictResult> {
   try {
-    const client = await getClient();
+    const client = await withTimeout(getClient(), ML_TIMEOUT_MS);
 
-    const res = await client.predict("/predict", [text, ML_API_KEY]);
+    const res = await withTimeout(
+      client.predict("/predict", [text, ML_API_KEY]),
+      ML_TIMEOUT_MS
+    );
 
     const data = res.data as [string, number];
     const [label, score] = data;
@@ -50,7 +56,7 @@ export async function classifyComplaint(text: string): Promise<PredictResult> {
     clientPromise = null; // reset agar reconnect di panggilan berikutnya
     return {
       ok: false,
-      error: err instanceof Error ? err.message : "Gagal memanggil ML service",
+      error: err instanceof TimeoutError ? "timeout" : (err instanceof Error ? err.message : "Gagal memanggil ML service"),
     };
   }
 }
