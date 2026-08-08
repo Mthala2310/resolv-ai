@@ -9,8 +9,8 @@ const adapter = new PrismaPg({
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
-  const email = "admin@resolv.ai";
-  const hashed = await hashPassword("admin123"); // ⚠️ ganti nanti dengan yang kuat
+  const email = "admin@gmail.com";
+  const hashed = await hashPassword("admin12345"); // ⚠️ ganti nanti dengan yang kuat
 
   const admin = await prisma.user.upsert({
     where: { email }, // cari user dengan email ini

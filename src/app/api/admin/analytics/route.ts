@@ -45,7 +45,7 @@ export async function GET() {
   // Tren 14 hari terakhir (label tanggal YYYY-MM-DD)
   const days: string[] = [];
   const today = new Date();
-  for (let i = 13; i >= 0; i--) {
+  for (let i = 30; i >= 0; i--) {
     const d = new Date(today);
     d.setDate(today.getDate() - i);
     days.push(d.toISOString().slice(0, 10));

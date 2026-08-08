@@ -169,7 +169,7 @@ export default function AnalyticsView() {
       <Card elevation={0} sx={{ borderRadius: 3, border: "1px solid #e2e8f0" }}>
         <CardContent>
           <Typography sx={{ fontSize: 14, fontWeight: 800, mb: 2 }}>
-            Tren Keluhan (14 hari terakhir)
+            Tren Keluhan (30 hari terakhir)
           </Typography>
           <Chart
             type="area"
