@@ -1,4 +1,4 @@
-import { PrismaClient } from "@/generated/prisma";
+import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 
 // Simpan instance Prisma di variabel global saat mode development
