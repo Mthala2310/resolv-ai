@@ -141,7 +141,7 @@ async function main() {
         prioritasPrediksi: prioritas,
         kategoriFinal: kategori, // Sesuai sistem
         prioritasFinal: prioritas, // Sesuai sistem
-        status,
+        status: status as any,
         createdAt,
         updatedAt: createdAt
       }
