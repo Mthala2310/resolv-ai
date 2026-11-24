@@ -5,8 +5,12 @@ import { PrismaPg } from "@prisma/adapter-pg";
 const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
 
 const createPrismaClient = () => {
+  // Ganti sslmode=require menjadi sslmode=verify-full agar tidak memicu security warning dari driver pg
+  const rawUrl = `${process.env.DATABASE_URL || ""}`;
+  const connectionString = rawUrl.replace("sslmode=require", "sslmode=verify-full");
+
   const adapter = new PrismaPg({
-    connectionString: `${process.env.DATABASE_URL}`,
+    connectionString,
   });
   return new PrismaClient({ adapter });
 };
