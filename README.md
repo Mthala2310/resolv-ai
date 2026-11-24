@@ -192,10 +192,6 @@ npx prisma db push
 npm run prisma:seed
 ```
 
-> **Catatan Kredensial Admin Bawaan**:
-> - **Email**: `admin@gmail.com`
-> - **Password**: `admin12345`
-
 ### 6. Menjalankan Aplikasi
 Jalankan server pengembangan:
 
