@@ -114,9 +114,11 @@ export default function AuthCard({
             display: { xs: "none", md: "block" },
             width: "50%",
             position: "relative",
-            background: "linear-gradient(135deg, #5D5FEF, #49BEFF)",
+            bgcolor: "#0b0f19",
+            overflow: "hidden",
           }}
         >
+          {/* Background Image: warna natural tanpa filter biru pekat */}
           <Box
             sx={{
               position: "absolute",
@@ -124,26 +126,73 @@ export default function AuthCard({
               backgroundImage: imageUrl ? `url(${imageUrl})` : "none",
               backgroundSize: "cover",
               backgroundPosition: "center",
-              opacity: 0.35,
+              transform: "scale(1.02)",
             }}
           />
+
+          {/* Gradient halus alami agar tulisan menyatu dengan gambar dan terbaca jelas tanpa kotak */}
+          <Box
+            sx={{
+              position: "absolute",
+              inset: 0,
+              background:
+                "linear-gradient(180deg, rgba(0, 0, 0, 0.45) 0%, rgba(0, 0, 0, 0.05) 35%, rgba(0, 0, 0, 0.25) 65%, rgba(0, 0, 0, 0.82) 100%)",
+            }}
+          />
+
+          {/* Konten layer */}
           <Box
             sx={{
               position: "absolute",
               inset: 0,
               display: "flex",
               flexDirection: "column",
-              justifyContent: "flex-end",
-              p: 5,
-              color: "#fff",
+              justifyContent: "space-between",
+              p: { xs: 3, md: 5 },
+              zIndex: 2,
             }}
           >
-            <Typography variant="h5" sx={{ fontWeight: 800, color: "#fff" }}>
-              Layanan keluhan, lebih cerdas.
-            </Typography>
-            <Typography sx={{ color: "rgba(255,255,255,0.9)" }}>
-              Klasifikasi & prioritas keluhan otomatis dengan AI.
-            </Typography>
+            {/* Teks atas (tanpa box & tanpa titik hijau) */}
+            <Box>
+              <Typography
+                sx={{
+                  fontSize: "0.85rem",
+                  fontWeight: 700,
+                  color: "rgba(255, 255, 255, 0.95)",
+                  letterSpacing: "0.06em",
+                  textTransform: "uppercase",
+                  textShadow: "0 2px 10px rgba(0, 0, 0, 0.6)",
+                }}
+              >
+              </Typography>
+            </Box>
+
+            {/* Teks informasi bawah (tanpa box, menyatu natural dengan gambar) */}
+            <Box>
+              <Typography
+                variant="h5"
+                sx={{
+                  fontWeight: 800,
+                  color: "#ffffff",
+                  mb: 1,
+                  fontSize: { md: "1.35rem", lg: "1.5rem" },
+                  lineHeight: 1.3,
+                  textShadow: "0 2px 14px rgba(0, 0, 0, 0.7)",
+                }}
+              >
+                Layanan keluhan, lebih cerdas.
+              </Typography>
+              <Typography
+                sx={{
+                  color: "rgba(255, 255, 255, 0.9)",
+                  fontSize: "0.925rem",
+                  lineHeight: 1.5,
+                  textShadow: "0 1px 8px rgba(0, 0, 0, 0.7)",
+                }}
+              >
+                Klasifikasi & prioritas keluhan otomatis dengan kecerdasan buatan.
+              </Typography>
+            </Box>
           </Box>
         </Box>
       </Paper>

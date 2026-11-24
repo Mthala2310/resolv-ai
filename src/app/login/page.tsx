@@ -19,16 +19,19 @@ export default function LoginPage() {
     e.preventDefault();
     setError("");
     setLoading(true);
+
     const res = await signIn("credentials", {
       email,
       password,
       redirect: false,
     });
+
     setLoading(false);
-    if (res?.error) setError("Email atau password salah.");
-    else {
-      router.push("/");
-      router.refresh();
+    if (res?.error) {
+      setError("Email atau password salah.");
+    } else {
+      // Navigasi penuh ke root (akan diarahkan otomatis ke /admin atau /keluhan sesuai role)
+      window.location.href = "/";
     }
   }
 
